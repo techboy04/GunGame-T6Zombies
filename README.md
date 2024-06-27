@@ -7,6 +7,10 @@ NOTE: Mob of the Dead currently does not work! All youre gonna get is an infinit
 
 Get a certain amount of kills (by default, 8) to upgrade to the next weapon. If you die, you get demoted. There is no end until someone finished the ladder. This game can be played solo or with other players, I tried my best to make it work with 8 players but I haven't been able to test it myself.
 
+Wallbuys and Mysteryboxes are unavailable.
+
+By Default, there is no perk limit
+
 The mode also has custom powerups: (thanks to Ox_ for this part of the code)
 - Skull Powerup: Goes to the next tier
 - Please Wait Flag: Pack A Punches current weapon
