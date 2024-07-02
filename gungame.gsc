@@ -41,8 +41,6 @@ main()
 		replacefunc(maps\mp\zombies\_zm::round_think, ::round_think_minigame);
 
 		replacefunc(maps\mp\zombies\_zm_powerups::init_powerups, ::init_powerups_minigame);
-
-		level thread ifzombiedies();
 	}
 }
 
@@ -69,6 +67,7 @@ init()
 		level waittill ("end");
 		level.leaper_rounds_enabled = 0;
 	}
+	level.callbackactorkilled = ::actor_killed_override;
 	
 }
 
@@ -325,61 +324,29 @@ new_vending_weapon_upgrade()
 
 }
 
-ifzombiedies()
-{
-    for(;;)
-    {
-        foreach( zombie in getaiarray( level.zombie_team ) )
-        {
-			if( !(IsDefined( zombie.waitingfordamage )) )
-			{
-				zombie.killedcheck = 1;
-				zombie thread zombiekilled();
-			}
-        }
-        wait 0.25;
-    }
-}
-
-zombiekilled()
-{
-    self endon( "killed" );
-    self.waitingfordamage = 1;
-    for(;;)
-    {
-        self waittill( "damage", amount, attacker, dir, point, mod );
-        if( isplayer( attacker ) )
-        {
-            if( !isalive( self ) )
-            {
-				if (attacker.weaponprog >= attacker.progmax - 1)
-				{
-					attacker.weaponprog = 0;
-					attacker changeweapon(false);
-//					attacker.progmax = (attacker.weaponlevel * 2);
-					attacker.progmax = 8;
-				}
-				else
-				{
-					attacker.weaponprog += 1;
-				}
-				level.zombie_total = 50;
-				level.zombieskilled += 1;
-				if (level.zombieskilled == 20)
-				{
-					level.zombieskilled = 0;
-					level notify ("force_next_round");
-				}
-				
-				self notify( "killed" );
-            }
-        }
-    }
-}
-
 createlist()
 {
 	level.weaponlist = [];
+	
+	if(getDvar("mapname") == "zm_tomb")
+	{
+		starter = "c96_zm";
+	}
+	else
+	{
+		starter = "m1911_zm";
+	}
+	
+	level.weaponlist[level.weaponlist.size] = starter;
+	
+	if (getDvarInt("gungame_ladder") == 1)
+	{
+		if ( maps\mp\zombies\_zm_weapons::can_upgrade_weapon( starter ) )
+		{
+			level.weaponlist[level.weaponlist.size] = maps\mp\zombies\_zm_weapons::get_upgrade_weapon( starter, false );
+		}
+	}
+	
 	foreach (guns in level.zombie_weapons)
 	{
 		if (isGun(guns.weapon_name))
@@ -400,7 +367,7 @@ createlist()
 isGun(gun)
 {
 	blockedguns = array("frag_grenade_zm", "sticky_grenade_zm", "claymore_zm", "cymbal_monkey_zm", "emp_grenade_zm", "knife_ballistic_no_melee_zm", "knife_ballistic_bowie_zm", "knife_ballistic_zm", "riotshield_zm", "jetgun_zm", "tazer_knuckles_zm", "time_bomb_zm", "tomb_shield_zm", "staff_air_zm", "staff_air_upgraded2_zm", "staff_air_upgraded3_zm", "staff_air_upgraded_zm", "staff_fire_zm", "staff_fire_upgraded_zm", "staff_fire_upgraded2_zm", "staff_fire_upgraded3_zm", "staff_lightning_zm", "staff_lightning_upgraded_zm", "staff_lightning2_upgraded_zm", "staff_lightning3_upgraded_zm", "staff_water_zm", "staff_water_zm_cheap", "staff_water_upgraded_zm", "staff_water_upgraded2_zm", "staff_water_upgraded3_zm", "staff_revive_zm", "beacon_zm", "claymore_zm");
-	blockedguns2 = array("bouncing_tomahawk_zm", "upgraded_tomahawk_zm", "alcatraz_shield_zm", "tower_trap_zm", "tower_trap_upgraded_zm", "knife_zm", "knife_zm_alcatraz", "spoon_zm_alcatraz", "spork_zm_alcatraz", "frag_grenade_zm", "claymore_zm", "willy_pete_zm");
+	blockedguns2 = array("bouncing_tomahawk_zm", "upgraded_tomahawk_zm", "alcatraz_shield_zm", "tower_trap_zm", "tower_trap_upgraded_zm", "knife_zm", "knife_zm_alcatraz", "spoon_zm_alcatraz", "spork_zm_alcatraz", "frag_grenade_zm", "claymore_zm", "willy_pete_zm", "c96_zm", "m1911_zm");
 	foreach (blocked in blockedguns)
 	{
 		if (gun == blocked)
@@ -2188,7 +2155,7 @@ betaMessage()
     betamessage.horzalign = "right";
     betamessage.vertalign = "top";
 	betamessage.foreground = 1;
-	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.5");
+	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.6");
 }
 
 set_time_frozen_on_end_game()
@@ -2237,4 +2204,75 @@ set_time_frozen(time, endon_notify)
 
 		wait 0.5;
 	}
+}
+
+actor_killed_override( einflictor, attacker, idamage, smeansofdeath, sweapon, vdir, shitloc, psoffsettime )
+{
+    if ( game["state"] == "postgame" )
+        return;
+
+    if ( isai( attacker ) && isdefined( attacker.script_owner ) )
+    {
+        if ( attacker.script_owner.team != self.aiteam )
+            attacker = attacker.script_owner;
+    }
+
+    if ( attacker.classname == "script_vehicle" && isdefined( attacker.owner ) )
+        attacker = attacker.owner;
+
+    if ( isdefined( attacker ) && isplayer( attacker ) )
+    {
+        multiplier = 1;
+
+        if ( is_headshot( sweapon, shitloc, smeansofdeath ) )
+            multiplier = 1.5;
+
+        type = undefined;
+
+        if ( isdefined( self.animname ) )
+        {
+            switch ( self.animname )
+            {
+                case "quad_zombie":
+                    type = "quadkill";
+                    break;
+                case "ape_zombie":
+                    type = "apekill";
+                    break;
+                case "zombie":
+                    type = "zombiekill";
+                    break;
+                case "zombie_dog":
+                    type = "dogkill";
+                    break;
+            }
+        }
+
+		if (attacker.weaponprog >= attacker.progmax - 1)
+		{
+			attacker.weaponprog = 0;
+			attacker changeweapon(false);
+//			attacker.progmax = (attacker.weaponlevel * 2);
+			attacker.progmax = 8;
+		}
+		else
+		{
+			attacker.weaponprog += 1;
+		}
+		level.zombie_total = 50;
+		level.zombieskilled += 1;
+		if (level.zombieskilled == 20)
+		{
+			level.zombieskilled = 0;
+			level notify ("force_next_round");
+        }
+
+
+    }
+
+    if ( isdefined( self.is_ziplining ) && self.is_ziplining )
+        self.deathanim = undefined;
+
+    if ( isdefined( self.actor_killed_override ) )
+        self [[ self.actor_killed_override ]]( einflictor, attacker, idamage, smeansofdeath, sweapon, vdir, shitloc, psoffsettime );
 }
