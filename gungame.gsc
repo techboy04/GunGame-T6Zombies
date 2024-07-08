@@ -2155,7 +2155,7 @@ betaMessage()
     betamessage.horzalign = "right";
     betamessage.vertalign = "top";
 	betamessage.foreground = 1;
-	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.6");
+	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.7");
 }
 
 set_time_frozen_on_end_game()
