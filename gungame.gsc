@@ -328,6 +328,8 @@ createlist()
 {
 	level.weaponlist = [];
 	
+	list = [];
+	
 	if(getDvar("mapname") == "zm_tomb")
 	{
 		starter = "c96_zm";
@@ -347,7 +349,7 @@ createlist()
 		}
 	}
 	
-	foreach (guns in level.zombie_weapons)
+	foreach (guns in weapons)
 	{
 		if (isGun(guns.weapon_name))
 		{
@@ -362,11 +364,14 @@ createlist()
 			}
 		}
 	}
+	
+	level.weaponlist = arraycombine(level.weaponlist, list, 1, 0);
+	
 }
 
 isGun(gun)
 {
-	blockedguns = array("frag_grenade_zm", "sticky_grenade_zm", "claymore_zm", "cymbal_monkey_zm", "emp_grenade_zm", "knife_ballistic_no_melee_zm", "knife_ballistic_bowie_zm", "knife_ballistic_zm", "riotshield_zm", "jetgun_zm", "tazer_knuckles_zm", "time_bomb_zm", "tomb_shield_zm", "staff_air_zm", "staff_air_upgraded2_zm", "staff_air_upgraded3_zm", "staff_air_upgraded_zm", "staff_fire_zm", "staff_fire_upgraded_zm", "staff_fire_upgraded2_zm", "staff_fire_upgraded3_zm", "staff_lightning_zm", "staff_lightning_upgraded_zm", "staff_lightning2_upgraded_zm", "staff_lightning3_upgraded_zm", "staff_water_zm", "staff_water_zm_cheap", "staff_water_upgraded_zm", "staff_water_upgraded2_zm", "staff_water_upgraded3_zm", "staff_revive_zm", "beacon_zm", "claymore_zm");
+	blockedguns = array("frag_grenade_zm", "sticky_grenade_zm", "claymore_zm", "cymbal_monkey_zm", "emp_grenade_zm", "knife_ballistic_no_melee_zm", "knife_ballistic_bowie_zm", "knife_ballistic_zm", "riotshield_zm", "jetgun_zm", "tazer_knuckles_zm", "time_bomb_zm", "tomb_shield_zm", "staff_air_upgraded2_zm", "staff_air_upgraded3_zm", "staff_air_upgraded_zm", "staff_fire_upgraded_zm", "staff_fire_upgraded2_zm", "staff_fire_upgraded3_zm", "staff_lightning_upgraded_zm", "staff_lightning2_upgraded_zm", "staff_lightning3_upgraded_zm", "staff_water_zm_cheap", "staff_water_upgraded_zm", "staff_water_upgraded2_zm", "staff_water_upgraded3_zm", "staff_revive_zm", "beacon_zm", "claymore_zm");
 	blockedguns2 = array("bouncing_tomahawk_zm", "upgraded_tomahawk_zm", "alcatraz_shield_zm", "tower_trap_zm", "tower_trap_upgraded_zm", "knife_zm", "knife_zm_alcatraz", "spoon_zm_alcatraz", "spork_zm_alcatraz", "frag_grenade_zm", "claymore_zm", "willy_pete_zm", "c96_zm", "m1911_zm");
 	foreach (blocked in blockedguns)
 	{
@@ -387,7 +392,12 @@ isGun(gun)
 
 changeweapon(demoted)
 {
-	self takeweapon(self getcurrentweapon());
+	primaries = self getweaponslistprimaries();
+	
+	foreach (weapon in primaries)
+	{
+		self takeweapon(weapon);
+	}
 	
 	if (self.weaponlevel >= (level.weaponlist.size - 1))
 	{
@@ -2155,7 +2165,7 @@ betaMessage()
     betamessage.horzalign = "right";
     betamessage.vertalign = "top";
 	betamessage.foreground = 1;
-	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.7");
+	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.8");
 }
 
 set_time_frozen_on_end_game()
