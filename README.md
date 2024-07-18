@@ -1,4 +1,4 @@
-# Gun Game - Plutonium T6 Zombies - Beta 0.7
+# Gun Game - Plutonium T6 Zombies - Beta 0.8
 I decided to recreate a Gun Game mode in Zombies.
 
 I did make this mode a little rough on the edges but it should work pretty well.
