@@ -29,8 +29,11 @@ You will have to open console and type in ```enable_gungame 1``` to enable this!
 ## Configuration
 This script lets you modify some features!
 - enable_gungame - Toggle the mode, best used if you want to keep the mode in your scripts folder when using any other mods.
-- gungame_ladder - Sets the gun ladder, currently there is only 0 (Regular guns) and 1 (Regular + Upgraded). There is more to come!
-Other options will be added as the mode gets updated. Stay tuned!
+- gungame_ladder - Sets the gun ladder. The ladder options are as follows.
+  - 0 is Regular Guns
+  - 1 is Regular and Upgraded
+  - 2 is Randomized Regular
+  - 3 is Regular and Upgraded but randomized
 
 ## Got a Bug or a Suggestion?
 As this mode is still being worked on, I accept suggestions and bugs. [Join the Discord server](https://discord.gg/dkwyDzW), Grab the Call of Duty role, and report it to [#technoops-forums](https://discord.com/channels/399600672586203137/1032884888468213811)
