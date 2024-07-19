@@ -88,7 +88,6 @@ onPlayerConnect()
 		player changeweapon(false);
 		player thread loopmaxammo();
 
-		player thread loopmaxammo();
         player thread onPlayerSpawned();
 		
 		player thread respawnPlayer();
@@ -195,75 +194,6 @@ init_powerups_minigame()
     registerclientfield( "scriptmover", "powerup_fx", 1000, 3, "int" );
 }
 
-kill_on_downed()
-{
-	for(;;)
-	{
-		self waittill ("player_downed");
-		self thread bleed_out();
-		
-		foreach (player in level.players)
-		{
-			player thread showBelowMessage(self.name + " has been eliminated!", "zmb_weap_wall");
-		}
-		
-		if (if_all_players_eliminated())
-		{
-			level.winner = self.name;
-			level notify ("end_game");
-		}
-	}
-}
-
-if_all_players_eliminated()
-{
-	foreach (player in get_players())
-	{
-		if (self.sessionstate == "spectator")
-		{
-			count += 1;
-		}
-	}
-	
-	if (count == level.players.size)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-cranked_timer()
-{
-	self.seconds = level.maxtime;
-	miliseconds = 10;
-	while(self.timerstarted == 1 && self.seconds > 0)
-	{
-		if(self.timerpaused == 0)
-		{
-			self.seconds -= 1;
-			miliseconds -= 1;
-			if (miliseconds <= 0)
-			{
-				miliseconds = 10;
-				if (self.seconds <= 100)
-				{
-					self thread red_glow(self.nametarget);
-					self playsound ("zmb_box_poof");
-				}
-			}
-		}
-		wait 0.1;
-	}
-	if(level.players.size == 1)
-	{
-		level.winner = self.name;
-	}
-	self dodamage(self.health, self.origin);
-}
-
 maintain_zombie_count()
 {
 	while(1)
@@ -272,31 +202,6 @@ maintain_zombie_count()
 		wait 1;
 	}
 }
-
-red_glow(elem)
-{
-	self endon("reset_glow");
-	colornum = 0;
-	while (colornum < 1)
-	{
-		elem.color = ( 1, colornum, colornum );
-		colornum += 0.05;
-		wait 0.01;
-	}
-}
-
-green_glow(elem)
-{
-	self endon("reset_glow");
-	colornum = 0;
-	while (colornum < 1)
-	{
-		elem.color = ( colornum, 1, colornum );
-		colornum += 0.05;
-		wait 0.01;
-	}
-}
-
 
 ///////////////////////////////////////////////////
 //
@@ -341,7 +246,7 @@ createlist()
 	
 	level.weaponlist[level.weaponlist.size] = starter;
 	
-	if (getDvarInt("gungame_ladder") == 1)
+	if (getDvarInt("gungame_ladder") == 1 || getDvarInt("gungame_ladder") == 3)
 	{
 		if ( maps\mp\zombies\_zm_weapons::can_upgrade_weapon( starter ) )
 		{
@@ -349,22 +254,26 @@ createlist()
 		}
 	}
 	
-	foreach (guns in weapons)
+	foreach (guns in level.zombie_weapons)
 	{
 		if (isGun(guns.weapon_name))
 		{
-			level.weaponlist[level.weaponlist.size] = guns.weapon_name;
+			list[list.size] = guns.weapon_name;
 			
-			if (getDvarInt("gungame_ladder") == 1)
+			if (getDvarInt("gungame_ladder") == 1 || getDvarInt("gungame_ladder") == 3)
 			{
 				if ( maps\mp\zombies\_zm_weapons::can_upgrade_weapon( guns.weapon_name ) )
 				{
-					level.weaponlist[level.weaponlist.size] = maps\mp\zombies\_zm_weapons::get_upgrade_weapon( guns.weapon_name, false );
+					list[list.size] = maps\mp\zombies\_zm_weapons::get_upgrade_weapon( guns.weapon_name, false );
 				}
 			}
 		}
 	}
 	
+	if (getDvarInt("gungame_ladder") == 2 || getDvarInt("gungame_ladder") == 3)
+	{
+		list = array_randomize(list);
+	}
 	level.weaponlist = arraycombine(level.weaponlist, list, 1, 0);
 	
 }
