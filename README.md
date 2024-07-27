@@ -24,7 +24,7 @@ Download gungame.gsc and put it in your Plutonium T6 scripts folder
 
 (if the folder isnt there create them)
 
-You will have to open console and type in ```enable_gungame 1``` to enable this! This is so you can still have the script in your folder while also able to disable it if you want to use other mods! **YOU MAY HAVE TO START A MATCH BEFORE TO LOAD UP THE DVAR THEN RESTART THE MATCH AFTER YOU SET IT (This isnt needed if you specify it in a config folder for a dedicated server)**
+You will have to open console and type in ```set enable_gungame 1``` to enable this! This is so you can still have the script in your folder while also able to disable it if you want to use other mods!
 
 ## Configuration
 This script lets you modify some features!
