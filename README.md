@@ -3,8 +3,8 @@ I decided to recreate a Gun Game mode in Zombies.
 
 I did make this mode a little rough on the edges but it should work pretty well.
 
-~~NOTE: Mob of the Dead currently does not work! All youre gonna get is an infinite loop which doesnt load the map!~~
-This has since been fixed if you use the ``mob_gungame_fix.gsc`` file in zm_prison. The file should be in ``script\zm\zm_prison\mob_gungame_fix.gsc``
+IF YOURE PLAYING MOB OF THE DEAD:
+You WILL need this fix or else the game will spam infinite loops. Use the ``mob_gungame_fix.gsc`` in ``scripts\zm\zm_prison\``
 
 Get a certain amount of kills (by default, 8) to upgrade to the next weapon. If you die, you get demoted. There is no end until someone finished the ladder. This game can be played solo or with other players, I tried my best to make it work with 8 players but I haven't been able to test it myself.
 
