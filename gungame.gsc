@@ -333,7 +333,9 @@ changeweapon(demoted)
 		self playsound ("zmb_cha_ching");
 	}
 	
-	self weapon_give( level.weaponlist[self.weaponlevel], 0, 0, 1 );
+//	self weapon_give( level.weaponlist[self.weaponlevel], 0, 0, 1 );
+	self GiveWeapon(level.weaponlist[self.weaponlevel]);
+	self SetSpawnWeapon(level.weaponlist[self.weaponlevel]);
 }
 
 gungameHUD()
@@ -706,8 +708,6 @@ end_game_minigame()
 {
     level waittill( "end_game" );
 	
-	level.winner = get_remaining_player().name;
-	
     check_end_game_intermission_delay();
 /#
     println( "end_game TRIGGERED " );
@@ -1056,10 +1056,13 @@ wait_for_ready_input()
 {
 	level endon ("end");
 	level.introHUD setText ("Press [{+melee}] and [{+speed_throw}] to ready up!: ^5" + level.playersready + "/" + level.players.size);
-	self waittill ("can_readyup");
+	if (!isDefined(self.bot))
+	{
+		self waittill ("can_readyup");
+	}
 	while(1)
 	{
-		if(self meleebuttonpressed() && self adsbuttonpressed())
+		if((self meleebuttonpressed() && self adsbuttonpressed()) || (isDefined(self.bot)))
 		{
 			if (self.voted == 0)
 			{
@@ -1105,7 +1108,7 @@ introHUD()
 
 playerScoresHUD(index, ref)
 {
-	y = (index * 20) + -60;
+	y = (index * 24) + -120;
 	
 	namebg = newhudelem();;
 	namebg.alignx = "left";
@@ -2074,7 +2077,7 @@ betaMessage()
     betamessage.horzalign = "right";
     betamessage.vertalign = "top";
 	betamessage.foreground = 1;
-	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.8");
+	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.9");
 }
 
 set_time_frozen_on_end_game()
