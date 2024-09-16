@@ -341,7 +341,7 @@ changeweapon(demoted)
 
 gungameHUD()
 {
-//	level endon("end_game");
+	level endon("end_game");
 	self endon( "disconnect" );
 	
 	nametext = newClientHudElem(self);
