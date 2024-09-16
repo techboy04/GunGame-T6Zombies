@@ -57,6 +57,7 @@ init()
 		level.playersready = 0;
 		level.gungamestarted = 0;
 		level.zombieskilled = 0;
+		level thread command_thread();
 		level thread introHUD();
 	
 		for( i = 0; i < 8; i++ )
@@ -1077,6 +1078,7 @@ wait_for_ready_input()
 					foreach (player in level.players)
 					{
 						player disableInvulnerability();
+						player iprintln("You can .restart to end the match!");
 					}
 					level notify ("end");
 				}
@@ -2077,7 +2079,7 @@ betaMessage()
     betamessage.horzalign = "right";
     betamessage.vertalign = "top";
 	betamessage.foreground = 1;
-	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.9");
+	betamessage setText ("TechnoOps Collection\nGun Game Beta\nb0.10");
 }
 
 set_time_frozen_on_end_game()
@@ -2197,4 +2199,99 @@ actor_killed_override( einflictor, attacker, idamage, smeansofdeath, sweapon, vd
 
     if ( isdefined( self.actor_killed_override ) )
         self [[ self.actor_killed_override ]]( einflictor, attacker, idamage, smeansofdeath, sweapon, vdir, shitloc, psoffsettime );
+}
+
+command_thread()
+{
+	level endon( "end_game" );
+	while ( true )
+	{
+		level waittill( "say", message, player, isHidden );
+		args = strTok( message, " " );
+		command = args[ 0 ];
+		switch ( command )
+		{
+			case ".restart":
+			case ".nextmap":
+			case ".nm":
+			case ".endmatch":
+				if(level.gungamestarted != 0)
+				{
+					if (level.gungame_nextmap_init == 0)
+					{
+						level thread initiate_restart();
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+initiate_restart()
+{
+	level.gungame_nextmap_init = 1;
+	level thread restartHUD();
+	foreach (player in level.players)
+	{
+		player thread wait_for_next_match_input();
+	}
+}
+
+restartHUD()
+{
+	level.gungamevotes = 0;
+	level.restarttime = 15;
+	level.restartHUD = newhudelem();
+	level.restartHUD.x = 0;
+	level.restartHUD.y -= 0;
+	level.restartHUD.alpha = 1;
+	level.restartHUD.alignx = "center";
+	level.restartHUD.aligny = "top";
+    level.restartHUD.horzalign = "user_center";
+    level.restartHUD.vertalign = "user_top";
+	level.restartHUD.foreground = 0;
+	level.restartHUD.fontscale = 1.5;
+//	level.restartHUD setText ("Press [{+melee}] and [{+speed_throw}] to vote to end the match!: ^5" + level.gungamevotes + "/" + level.players.size + " - " + level.restarttime);
+	
+	while(1)
+	{
+		level.restarttime -= 1;
+		level.restartHUD setText ("Press [{+melee}] and [{+speed_throw}] to vote to end the match!: ^5" + level.gungamevotes + "/" + level.players.size + " - " + level.restarttime);
+		wait 1;
+		if (level.restarttime == 0 || level.gungamevotes == level.players.size)
+		{
+			break;
+		}
+	}
+	
+	level.restartHUD destroy();
+	
+	if (level.restarttime == 0)
+	{
+		level.gungame_nextmap_init = 0;
+		level notify ("next_match_expired");
+	}
+	if (level.gungamevotes == level.players.size)
+	{
+		level.winner = "Nobody";
+		level notify( "end_game" );
+	}
+}
+
+wait_for_next_match_input()
+{
+	self endon ("next_match_voted");
+	level endon ("next_match_expired");
+	while(1)
+	{
+		if((self meleebuttonpressed() && self adsbuttonpressed()) || (isDefined(self.bot)))
+		{
+			level.gungamevotes += 1;
+			level.restartHUD setText ("Press [{+melee}] and [{+speed_throw}] to vote to end the match!: ^5" + level.gungamevotes + "/" + level.players.size + " - " + level.restarttime);
+			self notify ("next_match_voted");
+		}
+		wait 0.01;
+	}
 }
