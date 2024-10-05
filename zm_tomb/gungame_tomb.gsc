@@ -5,7 +5,7 @@
 
 main()
 {
-	if (getDvarInt("gamemode") == 1)
+	if (getDvarInt("enable_gungame") == 1)
 	{
 		replacefunc(maps\mp\zm_tomb_craftables::staffcraftable_air, ::staffcraftable_air_minigame);
 		replacefunc(maps\mp\zm_tomb_craftables::staffcraftable_fire, ::staffcraftable_fire_minigame);
