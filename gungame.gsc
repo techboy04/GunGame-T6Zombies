@@ -67,8 +67,8 @@ init()
 		}
 		level waittill ("end");
 		level.leaper_rounds_enabled = 0;
+                level.callbackactorkilled = ::actor_killed_override;
 	}
-	level.callbackactorkilled = ::actor_killed_override;
 	
 }
 
